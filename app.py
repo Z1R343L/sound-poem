@@ -66,7 +66,7 @@ except:
 	print("(Invalid or non-added scale, picking chromatic by default)")
 	scale = scaleList["chromatic"]
 
-print("Enter ending grade [1-"+str(len(scale))+"]: ", end="")
+print(f"Enter ending grade [1-{len(scale)}]: ", end="")
 try:
 	endingGrade = int(input())
 except:
@@ -86,16 +86,11 @@ if pitch < 1 or pitch > 7:
 
 print("Loop [y/n]: ", end="")
 loopQuery = input()
-if loopQuery == "y":
-	loop = True
-else:
-	loop = False
-
+loop = loopQuery == "y"
 print(text)
 
-notes_file = open("noteslist.txt")
-file_contents = notes_file.read()
-notes_file.close()
+with open("noteslist.txt") as notes_file:
+	file_contents = notes_file.read()
 noteslist = file_contents.splitlines()
 
 notesNum = {}
@@ -109,10 +104,10 @@ for i in range(len(keylist)):
 		grade = 1
 
 textNum = []
+duration = int(tempo*500)
 for i in range(len(text)):
-	duration = int(tempo*500)
 	waiting = int(tempo*1000)
-	if text[i] == " " or text[i] == ",":
+	if text[i] in [" ", ","]:
 		waiting *= 1
 	if text[i] == "'":
 		waiting = 100
@@ -120,10 +115,10 @@ for i in range(len(text)):
 
 melodyNotes = []
 
-for i in range(len(textNum)):
-	textNum[i][0] = round(textNum[i][0]*(len(scale)/12))
+for item in textNum:
+	item[0] = round(item[0] * (len(scale)/12))
 	mod = 0
-	j = textNum[i][0]-textNum[0][0]
+	j = item[0] - textNum[0][0]
 	mod += math.floor(j/len(scale))
 	if j >= 0:
 		while abs(j) >= len(scale):
@@ -131,7 +126,7 @@ for i in range(len(textNum)):
 	else:
 		while j < 0:
 			j = len(scale)+j
-	melodyNotes.append([scale[abs(j)], mod, textNum[i][1], textNum[i][2]])
+	melodyNotes.append([scale[abs(j)], mod, item[1], item[2]])
 
 letterNotes = {}
 freq = 16.3516
